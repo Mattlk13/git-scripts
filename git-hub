@@ -1,0 +1,41 @@
+#!/bin/sh
+
+set -x -e
+
+upstream="upstream"
+
+target() {
+    git remote show -n "$upstream" | awk -F/ '/Push/ { print $4 "/" $5 }'
+}
+
+user() {
+    git remote show -n origin | awk -F/ '/Push/ { print $4 }'
+}
+
+github_pull_request() {
+    branch=`git branch | awk '/^\*/ { print $2 }'`
+    user=`user`
+    git push origin "$branch"
+
+    message=`mktemp`
+    "$EDITOR" "$message"
+    title=`head -1 "$message"`
+    body=`tail -n +2 "$message"`
+
+    head="$user:$branch"
+    base="master"
+    data="{ \"title\": \"$title\", \"body\": \"$body\", \"head\": \"$head\", \"base\": \"$base\" }"
+
+    eval `echo "" | git credential-cache get`
+    url="https://api.github.com/repos/`target`/pulls"
+    curl -u "$username:$password" -X POST -d "$data" "$url"
+}
+
+github_clone() {
+    git clone https://github.com/"$1"
+}
+
+case "$1" in
+    pr) github_pull_request ;;
+    clone) github_clone "$2" ;;
+esac
