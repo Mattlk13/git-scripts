@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -x -e
+
+remote="${2:-origin}"
+
+git branch -d "$1"
+git branch -rd "$remote"/"$1"
+git push "$remote" :"$1"
