@@ -17,14 +17,20 @@ github_pull_request() {
     user=`user`
     git push origin "$branch"
 
-    message=`mktemp`
-    "$EDITOR" "$message"
-    title=`head -1 "$message"`
-    body=`tail -n +2 "$message"`
+    if -n "$1"; then
+	message=`mktemp`
+	"$EDITOR" "$message"
+	title=`head -1 "$message"`
+	body=`tail -n +2 "$message"`
+	data="{ \"title\": \"$title\", \"body\": \"$body\","
+    else
+	issue="$1"
+	data="{ \"issue\": \"$issue\","
+    fi
 
     head="$user:$branch"
     base="master"
-    data="{ \"title\": \"$title\", \"body\": \"$body\", \"head\": \"$head\", \"base\": \"$base\" }"
+    data="$data \"head\": \"$head\", \"base\": \"$base\" }"
 
     eval `echo "" | git credential-cache get`
     url="https://api.github.com/repos/`target`/pulls"
@@ -50,6 +56,6 @@ github_clone() {
 }
 
 case "$1" in
-    pr) github_pull_request ;;
+    pr) github_pull_request "$2" ;;
     clone) github_clone "$2" "$3" ;;
 esac
