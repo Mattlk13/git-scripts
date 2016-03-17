@@ -7,4 +7,6 @@ These scripts extends git with some useful functionality.
 - `git hub pr` - Create a GitHub pull request from current branch, to `upstream/master`.
 - `git hub pr <issue>` - Convert a GitHub issue to a pull request.
 
-Install them somewhere in your PATH.
+Install them somewhere in your PATH, e.g.
+
+    make install prefix=$HOME
