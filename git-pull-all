@@ -9,10 +9,10 @@ current_branch() {
 save_excursion() {
     current=`git branch | awk '/^\*/ { print $2 }'`
     touch .ensure-there-is-something-to-stash
-    git stash -a
+    git stash save -a git-pull-all
     "$@"
     git checkout "$current"
-    git stash pop
+    git stash pop -q
     rm .ensure-there-is-something-to-stash
 }
 
