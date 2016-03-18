@@ -4,6 +4,12 @@ set -x -e
 
 upstream="upstream"
 
+github_api() {
+    eval `echo "" | git credential-cache get`
+    url="https://api.github.com/$2"
+    curl -s -u "$username:$password" -X "$1" -d "$3" "$url"
+}
+
 target() {
     git remote show -n "$upstream" | awk -F/ '/Push/ { print $4 "/" $5 }'
 }
@@ -31,10 +37,7 @@ github_pull_request() {
     head="$user:$branch"
     base="master"
     data="$data \"head\": \"$head\", \"base\": \"$base\" }"
-
-    eval `echo "" | git credential-cache get`
-    url="https://api.github.com/repos/`target`/pulls"
-    curl -s -u "$username:$password" -X POST -d "$data" "$url"
+    github_api POST "repos/`target`/pulls" "$data"
 }
 
 get_parent() {
@@ -55,7 +58,19 @@ github_clone() {
     test -n "$parent" && (cd $dir; git remote add upstream "https://github.com/$parent")
 }
 
-case "$1" in
-    pr) github_pull_request "$2" ;;
-    clone) github_clone "$2" "$3" ;;
+github_new_repo() {
+    github_api POST user/repos "{ \"name\":\"$1\" }"
+}
+
+github_remove_repo() {
+    github_api DELETE "repos/$1"
+}
+
+cmd="$1"
+shift
+case "$cmd" in
+    clone) github_clone "$@" ;;
+    new) github_new_repo "$@" ;;
+    rm) github_remove_repo "$@" ;;
+    pr) github_pull_request "$@" ;;
 esac
