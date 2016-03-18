@@ -1,4 +1,4 @@
-SRC = git-br git-hub git-pull-all git-rebase-all git-remove-branch
+SRC = git-br git-hub git-pull-all git-rebase-all git-rm-br
 
 DESTDIR ?=
 prefix ?= /usr/local

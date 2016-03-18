@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+branch="$1"
+remote="${2:-origin}"
+
+force() {
+    echo -n 'Force? [yes]'
+    read y
+    case "$y" in
+	[Yy]*|"") git branch -D "$branch";;
+	*) exit 0;;
+    esac
+}
+
+current_branch() {
+    git branch | awk '/^\* / { print $2 }'
+}
+
+test "$branch" = `current_branch` && git checkout master
+git branch -d "$branch" || force
+git branch -rd "$remote/$branch"
+git push "$remote" ":$branch"
