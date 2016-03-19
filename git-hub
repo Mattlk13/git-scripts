@@ -45,7 +45,7 @@ get_parent() {
 }
 
 github_parent() {
-    curl -N -s "https://api.github.com/repos/$1" | get_parent
+    github_api GET "repos/$1" "" | get_parent
 }
 
 git_clone_dir() {
@@ -66,10 +66,15 @@ github_remove_repo() {
     github_api DELETE "repos/$1"
 }
 
+github_close_issue() {
+    github_api PATCH "repos/`target`/issues/$1" "{ \"state\":\"closed\" }"
+}
+
 cmd="$1"
 shift
 case "$cmd" in
     clone) github_clone "$@" ;;
+    close) github_close_issue "$@" ;;
     new) github_new_repo "$@" ;;
     rm) github_remove_repo "$@" ;;
     pr) github_pull_request "$@" ;;
