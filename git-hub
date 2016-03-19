@@ -18,6 +18,10 @@ user() {
     git remote show -n origin | awk -F/ '/Push/ { print $4 }'
 }
 
+get_number() {
+    awk -F: '/"number":/ { print $2 }' | tr -d ' ,'
+}
+
 github_pull_request() {
     branch=`git branch | awk '/^\*/ { print $2 }'`
     user=`user`
@@ -37,7 +41,7 @@ github_pull_request() {
     head="$user:$branch"
     base="master"
     data="$data \"head\": \"$head\", \"base\": \"$base\" }"
-    github_api POST "repos/`target`/pulls" "$data"
+    github_api POST "repos/`target`/pulls" "$data" | get_number
 }
 
 get_parent() {
