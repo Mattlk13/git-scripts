@@ -23,7 +23,7 @@ github_pull_request() {
     user=`user`
     git push origin "$branch"
 
-    if -n "$1"; then
+    if test -z "$1"; then
 	message=`mktemp`
 	"$EDITOR" "$message"
 	title=`head -1 "$message"`
