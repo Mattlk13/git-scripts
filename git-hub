@@ -85,11 +85,24 @@ github_new_issue() {
     rm -f TMP
 }
 
+github_help() {
+    cat <<EOF
+git hub clone <user/repo>
+git hub close <issue>
+git hub issue
+git hub new <repo>
+git hub pr
+git hub pr <issue>
+git hub rm <user/repo>
+EOF
+}
+
 cmd="$1"
 shift
 case "$cmd" in
     clone) github_clone "$@" ;;
     close) github_close_issue "$@" ;;
+    help) github_help ;;
     issue) github_new_issue "$@" ;;
     new) github_new_repo "$@" ;;
     rm) github_remove_repo "$@" ;;
