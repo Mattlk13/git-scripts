@@ -1,3 +1,5 @@
 #!/bin/sh
 
 git checkout -b "$1" "${2:-master}"
+git config "branch.$1.remote" origin
+git config "branch.$1.merge" "refs/heads/$1"
