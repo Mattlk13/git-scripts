@@ -31,7 +31,7 @@ github_pull_request() {
 	message=`mktemp`
 	"$EDITOR" "$message"
 	title=`head -1 "$message"`
-	body=`tail -n +2 "$message"`
+	body=`tail -n +2 "$message" | sed 's/$/\\\\n/'`
 	data="{ \"title\": \"$title\", \"body\": \"$body\","
     else
 	issue="$1"
@@ -40,8 +40,9 @@ github_pull_request() {
 
     head="$user:$branch"
     base="master"
-    data="$data \"head\": \"$head\", \"base\": \"$base\" }"
-    github_api POST "repos/`target`/pulls" "$data" | get_number
+    echo "$data \"head\": \"$head\", \"base\": \"$base\" }" > TMP
+    github_api POST "repos/`target`/pulls" "@TMP" | get_number
+    rm -f TMP
 }
 
 get_parent() {
@@ -74,11 +75,22 @@ github_close_issue() {
     github_api PATCH "repos/`target`/issues/$1" "{ \"state\":\"closed\" }"
 }
 
+github_new_issue() {
+    message=`mktemp`
+    "$EDITOR" "$message"
+    title=`head -1 "$message"`
+    body=`tail -n +2 "$message" | sed 's/$/\\\\n/'`
+    echo "{ \"title\": \"$title\", \"body\": \"$body\" }" > TMP
+    github_api POST "repos/`target`/issues" "@TMP"
+    rm -f TMP
+}
+
 cmd="$1"
 shift
 case "$cmd" in
     clone) github_clone "$@" ;;
     close) github_close_issue "$@" ;;
+    issue) github_new_issue "$@" ;;
     new) github_new_repo "$@" ;;
     rm) github_remove_repo "$@" ;;
     pr) github_pull_request "$@" ;;
