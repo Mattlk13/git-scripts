@@ -29,9 +29,15 @@ github_pull_request() {
 
     if test -z "$1"; then
 	message=`mktemp`
+	echo "# The first line will become the title.  The rest will be the description." > "$message"
+	echo "#" >> "$message"
+	echo "# Commits:" >> "$message"
+	git log --oneline upstream/master..HEAD | sed 's/^/# /' >> "$message"
 	"$EDITOR" "$message"
-	title=`head -1 "$message"`
-	body=`tail -n +2 "$message" | sed 's/$/\\\\n/'`
+	grep -v '^#' "$message" > "$message.2"
+	title=`head -1 "$message.2"`
+	body=`tail -n +2 "$message.2" | sed 's/$/ \\\\n/'`
+	rm -f "$message" "$message.2"
 	data="{ \"title\": \"$title\", \"body\": \"$body\","
     else
 	issue="$1"
@@ -79,7 +85,7 @@ github_new_issue() {
     message=`mktemp`
     "$EDITOR" "$message"
     title=`head -1 "$message"`
-    body=`tail -n +2 "$message" | sed 's/$/\\\\n/'`
+    body=`tail -n +2 "$message" | sed 's/$/ \\\\n/'`
     echo "{ \"title\": \"$title\", \"body\": \"$body\" }" > TMP
     github_api POST "repos/`target`/issues" "@TMP"
     rm -f TMP
