@@ -2,7 +2,11 @@
 
 set -e
 
-branch="$1"
+current_branch() {
+    git branch | awk '/^\* / { print $2 }'
+}
+
+branch="${1:-`current_branch`}"
 remote="${2:-origin}"
 
 force() {
