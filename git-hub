@@ -4,6 +4,11 @@ set -x -e
 
 upstream="upstream"
 
+fail() {
+    echo "$1" 1>&2
+    exit 1
+}
+
 github_api() {
     eval `echo "" | git credential-cache get`
     url="https://api.github.com/$2"
@@ -22,8 +27,27 @@ get_number() {
     awk -F: '/"number":/ { print $2 }' | tr -d ' ,'
 }
 
+get_branch_pr_number() {
+    while read i; do
+	case "$i" in
+	    *'"number":'*) number="$i" ;;
+	    *'"label":'*"$1"*) label="$i" ;;
+	    *'"label":'*) number="" ;;
+	esac
+	if test -n "$number" && test -n "$label"; then
+	    echo "$number" | get_number
+	    number=""
+	    label=""
+	fi
+    done
+}
+
+current_branch() {
+    git branch | awk '/^\* / { print $2 }'
+}
+
 github_pull_request() {
-    branch=`git branch | awk '/^\*/ { print $2 }'`
+    branch=`current_branch`
     user=`user`
     git push origin "$branch"
 
@@ -81,6 +105,19 @@ github_close_issue() {
     github_api PATCH "repos/`target`/issues/$1" "{ \"state\":\"closed\" }"
 }
 
+github_assign_issue() {
+    case "$1" in
+	[0-9]|[0-9]*[0-9]) issue="$1" ;;
+	*) user="$1" ;;
+    esac
+    if test -z "$issue"; then
+	issue=$(github_api GET "repos/`target`/pulls" | get_branch_pr_number `user`:`current_branch`)
+	test -z "$issue" && fail "Pull request not found"
+    fi
+    test -z "$user" && user=`user`
+    github_api PATCH "repos/`target`/issues/$issue" "{ \"assignee\":\"$user\" }"
+}
+
 github_new_issue() {
     message=`mktemp`
     "$EDITOR" "$message"
@@ -93,6 +130,7 @@ github_new_issue() {
 
 github_help() {
     cat <<EOF
+git hub assign [<issue>] [<user>]
 git hub clone <user/repo>
 git hub close <issue>
 git hub issue
@@ -106,6 +144,7 @@ EOF
 cmd="$1"
 shift
 case "$cmd" in
+    assign) github_assign_issue "$@" ;;
     clone) github_clone "$@" ;;
     close) github_close_issue "$@" ;;
     help) github_help ;;
