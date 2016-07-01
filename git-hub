@@ -10,7 +10,7 @@ fail() {
 }
 
 github_api() {
-    eval `echo "" | git credential-cache get`
+    eval `echo "host=github.com" | git credential-cache get`
     url="https://api.github.com/$2"
     curl -s -u "$username:$password" -X "$1" -d "$3" "$url"
 }
