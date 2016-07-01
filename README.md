@@ -4,7 +4,7 @@ These scripts extends git with some useful functionality.
 - `git rebase-all` - Rebases all local branches onto `master`.
 - `git rm-br <branch>` - Remove local, tracking, and remote branch.
 - `git hub assign [<issue>] [<user>]` - Assign GitHub issue or pull request.
-- `git hub clone <user/repo>` - Clone GitHub repository.
+- `git hub clone <[user/]repo>` - Clone GitHub repository.
 - `git hub close <issue>` - Close GitHub issue or pull request.
 - `git hub issue` - Create new GitHub issue.
 - `git hub label <label>` - Set GitHub issue label.

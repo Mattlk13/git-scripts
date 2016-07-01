@@ -88,8 +88,15 @@ git_clone_dir() {
 }
 
 github_clone() {
-    dir=`git_clone_dir "$1" "$2"`
-    parent=`github_parent "$1"`
+    case "$1" in
+    */*)
+	repo="$1";;
+    *)
+	eval `echo "host=github.com" | git credential-cache get`
+	repo="$username/$1";;
+    esac
+    dir=`git_clone_dir "$repo" "$2"`
+    parent=`github_parent "$repo"`
     test -n "$parent" && (cd $dir; git remote add upstream "https://github.com/$parent")
 }
 
@@ -136,13 +143,12 @@ github_new_issue() {
 github_help() {
     cat <<EOF
 git hub assign [<issue>] [<user>]
-git hub clone <user/repo>
+git hub clone <[user/]repo>
 git hub close <issue>
 git hub issue
 git hub label <label>
 git hub new <repo>
-git hub pr
-git hub pr <issue>
+git hub pr [<issue>]
 git hub rm <user/repo>
 EOF
 }
