@@ -10,7 +10,12 @@ fail() {
 }
 
 github_api() {
-    eval `echo "host=github.com" | git credential-cache get`
+    if test -r $HOME/.netrc; then
+	username=`awk '/^login/ { print $2 }' < $HOME/.netrc`
+	password=`awk '/^password/ { print $2 }' < $HOME/.netrc`
+    else
+	eval `echo "host=github.com" | git credential-cache get`
+    fi
     url="https://api.github.com/$2"
     curl -s -u "$username:$password" -X "$1" -d "$3" "$url"
 }
