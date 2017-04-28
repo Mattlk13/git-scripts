@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo -n 'Branch: '
+git symbolic-ref -q --short HEAD || echo '(detached)'
+git status -s
