@@ -1,0 +1,6 @@
+#!/bin/sh
+
+case $# in
+    0)	git show --stat;;
+    *)	git log --stat "$@";;
+esac

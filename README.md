@@ -15,6 +15,7 @@ These scripts extends git with some useful functionality.
 - `git hub pr` - Create a GitHub pull request from current branch, to `upstream/master`.
 - `git hub pr <issue>` - Convert a GitHub issue to a pull request.
 - `git hub rm <user/repo>` - Remove GitHub repository.
+- `git stat [...]` - Show diffstat.
 
 Install them somewhere in your PATH, e.g.
 
