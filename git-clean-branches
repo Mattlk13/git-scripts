@@ -1,0 +1,12 @@
+#!/bin/sh
+
+git branch -vv | grep ': gone' | while read i; do
+    set $i
+    echo "$1 upstream gone."
+    git log -1 --oneline "$1"
+    echo -n "Delete? "
+    read y < /dev/tty
+    case "$y" in
+	[Yy]*|"") git branch -D "$1";;
+    esac
+done

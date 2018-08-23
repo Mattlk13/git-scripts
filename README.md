@@ -3,6 +3,7 @@ These scripts extends git with some useful functionality.
 - `git pull-all` - Fetch from remotes and fast-forward the master branch.
 - `git rebase-all` - Rebases all local branches onto `master`.
 - `git rm-br <branch>` - Remove local, tracking, and remote branch.
+- `git clean-branches` - Delete branches whose upstream has gone.
 - `git ff [<branch>]` - Fast-forward merge.
 - `git st` - Current branch and working tree status.
 - `git hub assign [<issue>] [<user>]` - Assign GitHub issue or pull request.
